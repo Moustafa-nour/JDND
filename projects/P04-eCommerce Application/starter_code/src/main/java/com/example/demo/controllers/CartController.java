@@ -40,43 +40,49 @@ public class CartController {
 
     @PostMapping("/addToCart")
     public ResponseEntity<Cart> addTocart(@RequestBody ModifyCartRequest request, Principal principal) {
-        if(request.getUsername().equals(principal.getName())){
-        User user = userRepository.findByUsername(request.getUsername());
-        Optional<Item> item = itemRepository.findById(request.getItemId());
-        if (!item.isPresent()) {
-            logger.debug("No item found to be added to user's cart");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        Cart cart = user.getCart();
+        if (request.getUsername().equals(principal.getName())) {
+            User user = userRepository.findByUsername(request.getUsername());
+            if (user == null) {
+                throw new ItemNotFoundExcption("No such user!");
+            }
+            Optional<Item> item = itemRepository.findById(request.getItemId());
+            if (!item.isPresent()) {
+                logger.debug("No item found to be added to user's cart");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            Cart cart = user.getCart();
 //		for(int i=0;i<request.getQuantity();i++){
 //			cart.addItem(item.get());
 //		}
-        IntStream.range(0, request.getQuantity())
-                .forEach(i -> cart.addItem(item.get()));
-        cartRepository.save(cart);
-        logger.info("new items added to {} cart:{} ", request.getUsername(), itemRepository.findById(request.getItemId()).get().getName());
-        return ResponseEntity.ok(cart);
-        }else
+            IntStream.range(0, request.getQuantity())
+                    .forEach(i -> cart.addItem(item.get()));
+            cartRepository.save(cart);
+            logger.info("new items added to {} cart:{} ", request.getUsername(), itemRepository.findById(request.getItemId()).get().getName());
+            return ResponseEntity.ok(cart);
+        } else
             throw new ItemNotFoundExcption("No such user!");
     }
 
     @PostMapping("/removeFromCart")
-    public ResponseEntity<Cart> removeFromcart(@RequestBody ModifyCartRequest request,Principal principal) {
-        if(request.getUsername().equals(principal.getName())){
-        User user = userRepository.findByUsername(request.getUsername());
-        Optional<Item> item = itemRepository.findById(request.getItemId());
-        if (!item.isPresent()) {
-            logger.debug("this item does not exist in user's cart");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        Cart cart = user.getCart();
-        IntStream.range(0, request.getQuantity())
-                .forEach(i -> cart.removeItem(item.get()));
-        cartRepository.save(cart);
-        logger.info("Item removed from cart:{} ", item.get().getName());
+    public ResponseEntity<Cart> removeFromcart(@RequestBody ModifyCartRequest request, Principal principal) {
+        if (request.getUsername().equals(principal.getName())) {
+            User user = userRepository.findByUsername(request.getUsername());
+            if (user == null) {
+                throw new ItemNotFoundExcption("No such user!");
+            }
+            Optional<Item> item = itemRepository.findById(request.getItemId());
+            if (!item.isPresent()) {
+                logger.debug("this item does not exist in user's cart");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            Cart cart = user.getCart();
+            IntStream.range(0, request.getQuantity())
+                    .forEach(i -> cart.removeItem(item.get()));
+            cartRepository.save(cart);
+            logger.info("Item removed from cart:{} ", item.get().getName());
 
-        return ResponseEntity.ok(cart);
-        }else
+            return ResponseEntity.ok(cart);
+        } else
             throw new ItemNotFoundExcption();
 
     }
