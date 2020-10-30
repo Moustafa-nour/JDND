@@ -1,23 +1,20 @@
 pipeline {
-    agent {
-    docker {
-        image 'maven:3-alpine'
-        label 'my-defined-label'
-        args  '-v /tmp:/tmp'
-    }
-}
- stages {
-        stage('Example Build') {
+    agent any
+    stages {
+        stage('build') {
             steps {
-                sh 'mvn -B clean verify'
+                sh clean package
             }
         }
-         stage('Example Test') {
-            agent { docker 'openjdk:8-jre' } 
+        stage('test') {
             steps {
-                echo 'Hello, JDK'
-                sh 'java -version'
+                sh test
             }
+        }
+    }
+    post { 
+        always { 
+            echo 'I will always say Hello again!'
         }
     }
 }
