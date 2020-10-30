@@ -1,9 +1,11 @@
 package com.example.demo.controllers;
 
+import java.security.Principal;
 import java.util.Optional;
 
 import java.util.stream.IntStream;
 
+import com.example.demo.config.ItemNotFoundExcption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +39,9 @@ public class CartController {
     private ItemRepository itemRepository;
 
     @PostMapping("/addToCart")
-    public ResponseEntity<Cart> addTocart(@RequestBody ModifyCartRequest request) {
+    public ResponseEntity<Cart> addTocart(@RequestBody ModifyCartRequest request, Principal principal) {
+        if(request.getUsername().equals(principal.getName())){
         User user = userRepository.findByUsername(request.getUsername());
-        if (user == null) {
-            logger.debug("No user found to add to his cart");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         Optional<Item> item = itemRepository.findById(request.getItemId());
         if (!item.isPresent()) {
             logger.debug("No item found to be added to user's cart");
@@ -57,15 +56,14 @@ public class CartController {
         cartRepository.save(cart);
         logger.info("new items added to {} cart:{} ", request.getUsername(), itemRepository.findById(request.getItemId()).get().getName());
         return ResponseEntity.ok(cart);
+        }else
+            throw new ItemNotFoundExcption("No such user!");
     }
 
     @PostMapping("/removeFromCart")
-    public ResponseEntity<Cart> removeFromcart(@RequestBody ModifyCartRequest request) {
+    public ResponseEntity<Cart> removeFromcart(@RequestBody ModifyCartRequest request,Principal principal) {
+        if(request.getUsername().equals(principal.getName())){
         User user = userRepository.findByUsername(request.getUsername());
-        if (user == null) {
-            logger.debug("No user found to add to his cart");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         Optional<Item> item = itemRepository.findById(request.getItemId());
         if (!item.isPresent()) {
             logger.debug("this item does not exist in user's cart");
@@ -78,6 +76,9 @@ public class CartController {
         logger.info("Item removed from cart:{} ", item.get().getName());
 
         return ResponseEntity.ok(cart);
+        }else
+            throw new ItemNotFoundExcption();
+
     }
 
 }

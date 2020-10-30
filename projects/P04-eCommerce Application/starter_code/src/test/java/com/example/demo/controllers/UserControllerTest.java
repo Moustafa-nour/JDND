@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
@@ -27,8 +28,7 @@ public class UserControllerTest {
     private CartRepository cartRepo = mock(CartRepository.class);
     private BCryptPasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
     static User user;
-
-
+    private static UsernamePasswordAuthenticationToken authenticationToken;
 
 
     @Before
@@ -45,6 +45,8 @@ public class UserControllerTest {
         user.setUsername("Moustafa");
         user.setPassword("test123");
         user.setId(1);
+        authenticationToken =new UsernamePasswordAuthenticationToken("Moustafa",null,null);
+
     }
 
     @Test
@@ -72,14 +74,14 @@ public class UserControllerTest {
     @Test
     public void verify_findById(){
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        ResponseEntity<User> response = userController.findById(1L);
+        ResponseEntity<User> response = userController.findById(1L,authenticationToken);
         assertEquals(200,response.getStatusCodeValue());
     }
 
     @Test
     public void verify_findByUserName(){
         when(userRepo.findByUsername("Moustafa")).thenReturn(user);
-        ResponseEntity<User> response=userController.findByUserName("Moustafa");
+        ResponseEntity<User> response=userController.findByUserName("Moustafa",authenticationToken);
         assertNotNull(response);
         assertEquals(HttpStatus.OK,response.getStatusCode());
     }

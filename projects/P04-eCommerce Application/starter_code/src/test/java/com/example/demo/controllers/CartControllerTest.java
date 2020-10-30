@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.TestUtils;
+import com.example.demo.config.ItemNotFoundExcption;
 import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.Item;
 import com.example.demo.model.persistence.User;
@@ -9,14 +10,16 @@ import com.example.demo.model.persistence.repositories.ItemRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.ModifyCartRequest;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +34,8 @@ public class CartControllerTest {
     private  User user;
     private  Item item;
     private ModifyCartRequest request;
+    private static UsernamePasswordAuthenticationToken authenticationToken;
+
 
     public void createItem(){
         item=new Item();
@@ -46,6 +51,10 @@ public class CartControllerTest {
         user=new User();
         user.setUsername("Moustafa");
         user.setCart(cart);
+    }
+    @BeforeClass
+    public static void setup(){
+        authenticationToken =new UsernamePasswordAuthenticationToken("Moustafa",null,null);
     }
     @Before
     public void initial(){
@@ -69,7 +78,7 @@ public class CartControllerTest {
     @Test
     public void verify_addToCart_happy_path(){
 
-        ResponseEntity<Cart> response = cartController.addTocart(request);
+        ResponseEntity<Cart> response = cartController.addTocart(request, authenticationToken);
         assertEquals(200,response.getStatusCodeValue());
         assertEquals(cart,response.getBody());
         assertEquals(BigDecimal.valueOf(3.0),response.getBody().getTotal());
@@ -77,39 +86,40 @@ public class CartControllerTest {
 
     }
 
-    @Test
+    @Test(expected = ItemNotFoundExcption.class)
     public void verify_addToCart_sad_path(){
         request.setItemId(2L);
 
-        ResponseEntity<Cart> response = cartController.addTocart(request);
+        ResponseEntity<Cart> response = cartController.addTocart(request, authenticationToken);
         assertEquals(404,response.getStatusCodeValue());
         assertNull(response.getBody());
 
         request.setItemId(1L);
         request.setUsername("Nour");
-        ResponseEntity<Cart> response2 = cartController.addTocart(request);
-        assertEquals(404,response2.getStatusCodeValue());
-        assertNull(response2.getBody());
+        assertThrows(ItemNotFoundExcption.class, (ThrowingRunnable) cartController.addTocart(request, authenticationToken));
+        assertEquals(404,response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
     public void verify_removeFromcart_happy_path(){
        request.setQuantity(1);
-        ResponseEntity<Cart> response = cartController.removeFromcart(request);
+        ResponseEntity<Cart> response = cartController.removeFromcart(request, authenticationToken);
         assertEquals(200,response.getStatusCodeValue());
         assertEquals(BigDecimal.valueOf(-1.0),response.getBody().getTotal());
     }
-    @Test
+
+    @Test(expected = ItemNotFoundExcption.class)
     public void verify_removeFromcart_sad_path(){
         request.setItemId(2L);
         request.setQuantity(1);
-        ResponseEntity<Cart> response = cartController.removeFromcart(request);
+        ResponseEntity<Cart> response = cartController.removeFromcart(request, authenticationToken);
         assertEquals(404,response.getStatusCodeValue());
         assertNull(response.getBody());
 
         request.setItemId(1L);
         request.setUsername("Nour");
-        ResponseEntity<Cart> response2 = cartController.removeFromcart(request);
+        ResponseEntity<Cart> response2 = cartController.removeFromcart(request, authenticationToken);
         assertEquals(404,response2.getStatusCodeValue());
         assertNull(response2.getBody());
     }

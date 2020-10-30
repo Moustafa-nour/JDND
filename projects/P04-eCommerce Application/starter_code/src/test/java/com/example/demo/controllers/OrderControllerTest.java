@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.TestUtils;
+import com.example.demo.config.ItemNotFoundExcption;
 import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.Item;
 import com.example.demo.model.persistence.User;
@@ -8,8 +9,10 @@ import com.example.demo.model.persistence.UserOrder;
 import com.example.demo.model.persistence.repositories.OrderRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,6 +31,12 @@ public class OrderControllerTest {
     private UserOrder order;
     private User user;
     List<Item> items;
+    private static UsernamePasswordAuthenticationToken authenticationToken;
+
+    @BeforeClass
+    public static void setup(){
+        authenticationToken =new UsernamePasswordAuthenticationToken("Moustafa",null,null);
+    }
     @Before
     public void init(){
         orderController=new OrderController();
@@ -69,28 +78,28 @@ public class OrderControllerTest {
     }
     @Test
     public void verify_submit_order_happy_path(){
-        ResponseEntity<UserOrder> response = orderController.submit("Moustafa");
+        ResponseEntity<UserOrder> response = orderController.submit("Moustafa",authenticationToken);
         assertEquals(200,response.getStatusCodeValue());
 
     }
-    @Test
+    @Test(expected = ItemNotFoundExcption.class)
     public void verify_submit_order_sad_path(){
-        ResponseEntity<UserOrder> response = orderController.submit("Nour");
+        ResponseEntity<UserOrder> response = orderController.submit("Nour",authenticationToken);
         assertEquals(404,response.getStatusCodeValue());
         assertNull(response.getBody());
     }
 
     @Test
     public void verify_getOrdersForUser_happy_path(){
-        ResponseEntity<List<UserOrder>> response = orderController.getOrdersForUser("Moustafa");
+        ResponseEntity<List<UserOrder>> response = orderController.getOrdersForUser("Moustafa",authenticationToken);
         assertEquals(200,response.getStatusCodeValue());
         assertEquals(1,response.getBody().size());
 
     }
 
-    @Test
+    @Test(expected = ItemNotFoundExcption.class)
     public void verify_getOrdersForUser_sad_path(){
-        ResponseEntity<List<UserOrder>> response = orderController.getOrdersForUser("Nour");
+        ResponseEntity<List<UserOrder>> response = orderController.getOrdersForUser("Nour",authenticationToken);
         assertEquals(404,response.getStatusCodeValue());
         assertNull(response.getBody());
 
