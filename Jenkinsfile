@@ -6,7 +6,8 @@ pipeline {
     stages {
         stage('build') {
             steps {
-               sh 'mvn --file /var/'jenkins_home'/workspace/'project-demo'/projects/'P04-eCommerce Application'/'starter_code'/pom.xml clean package'
+              // sh 'mvn --file /var/'jenkins_home'/workspace/'project-demo'/projects/'P04-eCommerce Application'/'starter_code'/pom.xml clean package'
+                sh 'mvn clean'
             }
         }
         stage('test') {
