@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {
-    Logger logger = LoggerFactory.getLogger(CartController.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(CartController.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -28,13 +28,19 @@ public class OrderController {
 
     @PostMapping("/submit/{username}")
     public ResponseEntity<UserOrder> submit(@PathVariable String username, Principal principal) {
+        LOGGER.info("Trial order submission for user={}",username);
         if (username.equals(principal.getName())) {
             User user = userRepository.findByUsername(username);
+            if (user == null) {
+                LOGGER.error("Restricted action to user={}",username);
+                throw new ItemNotFoundExcption("No such user!");
+            }
             UserOrder order = UserOrder.createFromCart(user.getCart());
             orderRepository.save(order);
-            logger.info("items submitted for: {}.", user.getUsername());
+            LOGGER.info("items submitted for user={}", user.getUsername());
             return ResponseEntity.ok(order);
         } else
+            LOGGER.error("Restricted action to user={}",username);
             throw new ItemNotFoundExcption("No such user!");
     }
 
