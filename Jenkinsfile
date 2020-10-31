@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-               bash 'mvn -f /var/jenkins_home/workspace/'project demo'/projects/'P04-eCommerce Application'/starter_code clean'
+               mvn -f /var/jenkins_home/workspace/'project demo'/projects/'P04-eCommerce Application'/starter_code clean
                // sh 'mvn clean'
             }
         }
