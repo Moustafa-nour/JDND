@@ -7,12 +7,12 @@ pipeline {
     stages {
         stage('build') {
                  steps {
-                    sh ' mvn -f /var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code clean package'
+                    sh ' mvn -f /var/jenkins_home/workspace/\'JNDN pipeline demo\'/projects/\'P04-eCommerce Application\'/starter_code clean package'
                         }
         }
         stage('test') {
                  steps {
-                     sh 'mvn -f /var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code clean test'
+                     sh 'mvn -f /var/jenkins_home/workspace/\'JNDN pipeline demo\'/projects/\'P04-eCommerce Application\'/starter_code clean test'
                       }
         }
     
