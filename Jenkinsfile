@@ -21,7 +21,7 @@ pipeline {
            
                  steps {
                      // dir('/var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code') {
-                      sh 'mvn test'
+                      sh 'mvn -f /var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code test'
                       //}
                     
             }
