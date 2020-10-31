@@ -8,10 +8,10 @@ pipeline {
         stage('build') {
             
                  steps {
-                    dir('/var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code') {
-                    sh 'mvn clean'
-                    }
-                   // sh ' mvn "-f /var/jenkins_home/workspace/'project demo'/projects/'P04-eCommerce Application'/starter_code" clean'
+                   // dir('/var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code') {
+                    //sh 'mvn clean'
+                    //}
+                    sh ' mvn -f /var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code clean'
                     
                         }
                    
@@ -20,9 +20,9 @@ pipeline {
         stage('test') {
            
                  steps {
-                      dir('/var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code') {
+                     // dir('/var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code') {
                       sh 'mvn test'
-                      }
+                      //}
                     
             }
         }
