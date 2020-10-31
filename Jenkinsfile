@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-               sh 'mvn package'
+               sh 'mvn -f JDND/projects/P04-eCommerce Application/starter_code/pom.xml package'
             }
         }
         stage('test') {
