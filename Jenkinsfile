@@ -12,7 +12,7 @@ pipeline {
         }
         stage('test') {
                  steps {
-                     sh 'mvn -f /var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code test'
+                     sh 'mvn -f /var/jenkins_home/workspace/\'project demo\'/projects/\'P04-eCommerce Application\'/starter_code clean'
                       }
         }
     
