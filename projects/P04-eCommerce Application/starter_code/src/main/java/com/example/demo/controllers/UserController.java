@@ -35,13 +35,13 @@ public class UserController {
 
     @GetMapping("/id/{id}")
     public ResponseEntity<User> findById(@PathVariable Long id, Principal principal) {
-        LOGGER.info("Trial to find user by Id={}", id);
+        LOGGER.info("FindUserById request, Id={}", id);
         if (userRepository.findById(id).orElseThrow(() -> new ItemNotFoundExcption("No such user!"))
                 .getUsername().equals(principal.getName())) {
             LOGGER.info("found user={}", userRepository.findById(id).get().getUsername());
             return ResponseEntity.of(userRepository.findById(id));
         } else {
-            LOGGER.error("Restricted action to user={}", userRepository.findById(id).get().getUsername());
+            LOGGER.error("Exception:Forbidden access to user={}", userRepository.findById(id).get().getUsername());
             throw new ItemNotFoundExcption("No such user!");
         }
 //        return new ResponseEntity(userRepository.findById(id), HttpStatus.OK);
@@ -49,22 +49,22 @@ public class UserController {
 
     @GetMapping("/{username}")
     public ResponseEntity<User> findByUserName(@PathVariable String username, Principal principal) {
-        LOGGER.info("Trial to find user by name={}", username);
+        LOGGER.info("FindByUserName request, name={}", username);
         if (principal.getName().equals(username)) {
             LOGGER.info("found user={}", username);
             return ResponseEntity.ok(userRepository.findByUsername(username));
         } else {
-            LOGGER.error("Restricted action to user={}", username);
+            LOGGER.error("Exception:forbidden access to user={}", username);
             throw new ItemNotFoundExcption("No such user!");
         }
     }
 
     @PostMapping("/create")
     public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
-        LOGGER.info("Creating new user={}", createUserRequest.getUsername());
+        LOGGER.info("CreateUser request ", createUserRequest.getUsername());
         User user = new User();
         if (userRepository.findByUsername(createUserRequest.getUsername()) != null) {
-            LOGGER.error("Username validation failed");
+            LOGGER.error("CreateUser request failures, Username validation failed");
             return ResponseEntity.badRequest().build();
         }
         user.setUsername(createUserRequest.getUsername());
@@ -72,7 +72,7 @@ public class UserController {
         cartRepository.save(cart);
         user.setCart(cart);
         if (createUserRequest.getPassword().length() < 7 || !createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
-            LOGGER.error("Password validation failed");
+            LOGGER.error("CreateUser request failures, Password validation failed");
             return ResponseEntity.badRequest().build();
         }
 //		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
@@ -80,7 +80,7 @@ public class UserController {
         user.setPassword(BCrypt.hashpw(createUserRequest.getPassword(), salt));
         user.setSalt(salt);
         userRepository.save(user);
-        LOGGER.info("new user created with name={}", user.getUsername());
+        LOGGER.info("CreateUser request successes, user={}", user.getUsername());
         return ResponseEntity.ok(user);
     }
 

@@ -40,16 +40,16 @@ public class CartController {
 
     @PostMapping("/addToCart")
     public ResponseEntity<Cart> addTocart(@RequestBody ModifyCartRequest request, Principal principal) {
-        LOGGER.info("Trial to add items to user={} cart", request.getUsername());
+        LOGGER.info("AddToCart request, user={}", request.getUsername());
         if (request.getUsername().equals(principal.getName())) {
             User user = userRepository.findByUsername(request.getUsername());
             if (user == null) {
-                LOGGER.error("Restricted action to user={}", request.getUsername());
+                LOGGER.error("Exception:user not found to user={}", request.getUsername());
                 throw new ItemNotFoundExcption("No such user!");
             }
             Optional<Item> item = itemRepository.findById(request.getItemId());
             if (!item.isPresent()) {
-                LOGGER.error("No item found to be added to user={} cart", request.getUsername());
+                LOGGER.error("Exception:item not found ,user={}", request.getUsername());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
             Cart cart = user.getCart();
@@ -59,35 +59,35 @@ public class CartController {
             IntStream.range(0, request.getQuantity())
                     .forEach(i -> cart.addItem(item.get()));
             cartRepository.save(cart);
-            LOGGER.info("item={} added to user={} cart", itemRepository.findById(request.getItemId()).get().getName(), request.getUsername());
+            LOGGER.info("item={} added to user={} ", itemRepository.findById(request.getItemId()).get().getName(), request.getUsername());
             return ResponseEntity.ok(cart);
         } else
-            LOGGER.error("Restricted action to user={}", request.getUsername());
+            LOGGER.error("Exception:forbidden access to user={}", request.getUsername());
         throw new ItemNotFoundExcption("No such user!");
     }
 
     @PostMapping("/removeFromCart")
     public ResponseEntity<Cart> removeFromcart(@RequestBody ModifyCartRequest request, Principal principal) {
-        LOGGER.info("Trial to remove item from user={} cart", request.getUsername());
+        LOGGER.info("RemoveFromCart request user={}", request.getUsername());
         if (request.getUsername().equals(principal.getName())) {
             User user = userRepository.findByUsername(request.getUsername());
             if (user == null) {
-                LOGGER.error("Restricted action to user={}", request.getUsername());
+                LOGGER.error("Exception:user not found, user={}", request.getUsername());
                 throw new ItemNotFoundExcption("No such user!");
             }
             Optional<Item> item = itemRepository.findById(request.getItemId());
             if (!item.isPresent()) {
-                LOGGER.error("item does not exist in user={} cart", user.getUsername());
+                LOGGER.error("Exception:item not found, user={}", user.getUsername());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
             Cart cart = user.getCart();
             IntStream.range(0, request.getQuantity())
                     .forEach(i -> cart.removeItem(item.get()));
             cartRepository.save(cart);
-            LOGGER.info("Item removed from user={} cart ", request.getUsername());
+            LOGGER.info("Item={} removed, user={}",itemRepository.findById(request.getItemId()).get().getName(), request.getUsername());
             return ResponseEntity.ok(cart);
         } else
-            LOGGER.error("Restricted action to user={}", request.getUsername());
+            LOGGER.error("Exception:forbidden access to user={}", request.getUsername());
         throw new ItemNotFoundExcption();
 
     }

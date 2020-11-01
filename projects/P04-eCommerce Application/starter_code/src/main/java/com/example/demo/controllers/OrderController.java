@@ -28,19 +28,19 @@ public class OrderController {
 
     @PostMapping("/submit/{username}")
     public ResponseEntity<UserOrder> submit(@PathVariable String username, Principal principal) {
-        LOGGER.info("Trial order submission for user={}",username);
+        LOGGER.info("Order submit request, user={}",username);
         if (username.equals(principal.getName())) {
             User user = userRepository.findByUsername(username);
             if (user == null) {
-                LOGGER.error("Restricted action to user={}",username);
+                LOGGER.error("Exception:user not found , user={}",username);
                 throw new ItemNotFoundExcption("No such user!");
             }
             UserOrder order = UserOrder.createFromCart(user.getCart());
             orderRepository.save(order);
-            LOGGER.info("items submitted for user={}", user.getUsername());
+            LOGGER.info("order requests successes, user={}", user.getUsername());
             return ResponseEntity.ok(order);
         } else
-            LOGGER.error("Restricted action to user={}",username);
+            LOGGER.error("order requests failures, Exceptiom:forbidden access to user={}",username);
             throw new ItemNotFoundExcption("No such user!");
     }
 
@@ -50,6 +50,7 @@ public class OrderController {
                 User user = userRepository.findByUsername(username);
                 return ResponseEntity.ok(orderRepository.findByUser(user));
             }else
+                LOGGER.error("Exception:forbidden access to user={}",username);
                 throw new ItemNotFoundExcption("No such user!");
         }
     }
