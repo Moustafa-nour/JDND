@@ -1,0 +1,13 @@
+<!--<?xml version="1.0" encoding="utf-8" ?>-->
+<!--<Configuration>-->
+<!--    <Appender>-->
+<!--        <Console name="console" target="SYSTEM_OUT">-->
+<!--            <PatternLayout  pattern="%d %t %level  %c %msg %n"/>-->
+<!--        </Console>-->
+<!--    </Appender>-->
+<!--    <Loggers>-->
+<!--        <Root level="info">-->
+<!--            <AppenderRef ref="console"/>-->
+<!--        </Root>-->
+<!--    </Loggers>-->
+<!--</Configuration>-->
